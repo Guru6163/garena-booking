@@ -64,7 +64,11 @@ const CalendarBooking: React.FC = () => {
   };
 
   const formatDate = (date: Date) => {
-    return date.toISOString().split('T')[0];
+    // Use local timezone instead of UTC to avoid timezone issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const getBookingsForDate = (date: Date) => {
@@ -88,6 +92,13 @@ const CalendarBooking: React.FC = () => {
     setSelectedDate(date);
     setIsModalOpen(true);
     setNewBooking({ name: '', whatsapp: '', startTime: '', endTime: '', isOvernight: false });
+  };
+
+  const handleModalClose = (open: boolean) => {
+    setIsModalOpen(open);
+    if (!open) {
+      setSelectedDate(null);
+    }
   };
 
   const timeToMinutes = (timeString: string): number => {
@@ -255,7 +266,9 @@ const CalendarBooking: React.FC = () => {
 
   const days = getDaysInMonth(currentDate);
   const currentMonthBookings = selectedDate ? getBookingsForDate(selectedDate) : [];
+  // Create today's date at midnight to match calendar dates
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const todayStr = formatDate(today);
 
   return (
@@ -372,6 +385,7 @@ const CalendarBooking: React.FC = () => {
               const dayBookings = getBookingsForDate(day);
               const isToday = dateStr === todayStr;
               const isPast = day < today && !isToday;
+              const isSelected = selectedDate && formatDate(selectedDate) === dateStr;
 
               return (
                 <button
@@ -381,6 +395,7 @@ const CalendarBooking: React.FC = () => {
                   className={`
                     p-1 md:p-2 h-12 md:h-20 border rounded-md md:rounded-lg text-left transition-colors hover:bg-accent
                     ${isToday ? 'bg-primary text-primary-foreground' : ''}
+                    ${isSelected && !isToday ? 'bg-accent border-primary' : ''}
                     ${isPast ? 'opacity-50 cursor-not-allowed bg-muted' : 'cursor-pointer'}
                     ${dayBookings.length > 0 ? 'border-primary' : 'border-border'}
                     touch-manipulation
@@ -406,7 +421,7 @@ const CalendarBooking: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog open={isModalOpen} onOpenChange={handleModalClose}>
         <DialogContent className="w-[95vw] max-w-md mx-auto max-h-[90vh] overflow-y-auto">
           <DialogHeader className="pb-2">
             <DialogTitle className="text-base md:text-lg leading-tight">
@@ -740,7 +755,7 @@ const CalendarBooking: React.FC = () => {
       <footer className="container mx-auto px-3 md:px-4 pb-4 md:pb-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center text-sm text-muted-foreground border-t pt-4">
-            Developed by <span className="font-semibold text-foreground">guruf</span>
+            developed by <span className="font-semibold text-foreground">guruf</span>
           </div>
         </div>
       </footer>
