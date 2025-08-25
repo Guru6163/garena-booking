@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       return hours * 60 + minutes;
     };
 
-    const checkTimeOverlap = (newStart: string, newEnd: string, existingBookings: any[]): boolean => {
+    const checkTimeOverlap = (newStart: string, newEnd: string, existingBookings: { timeRange: string }[]): boolean => {
       const newStartMinutes = timeToMinutes(newStart);
       const newEndMinutes = timeToMinutes(newEnd);
 

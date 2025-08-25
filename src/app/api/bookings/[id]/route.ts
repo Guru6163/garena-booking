@@ -4,10 +4,10 @@ import { prisma } from '@/lib/prisma'
 // DELETE - Delete a booking by ID
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
 
     // Check if booking exists
     const existingBooking = await prisma.booking.findUnique({
@@ -41,10 +41,10 @@ export async function DELETE(
 // GET - Get a specific booking by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
 
     const booking = await prisma.booking.findUnique({
       where: { id }
